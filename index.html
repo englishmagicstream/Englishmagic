@@ -695,7 +695,7 @@ function renderQuiz() {
   const v = document.createElement('div');
   v.innerHTML = `<section class="band pad"><div class="wrap narrow">
     <div class="crumb"><a href="#">Home</a><span>/</span><a href="${catHref(d.cat)}">${esc(d.cat)}</a>${d.sub ? `<span>/</span><a href="${catHref(d.cat, d.sub)}">${esc(d.sub)}</a>` : ''}</div>
-    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC && S.mode !== 'test' ? `<div class="score">Score <b>${sc.s}</b> / ${d.nMC}</div>` : ''}</div>
+    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC && S.mode !== 'test' ? `<div class="score">Score <b>${sc.t ? Math.round(sc.s / sc.t * 100) : 0}%</b> (${sc.s}/${sc.t})</div>` : ''}</div>
     ${d.ex.length ? `<button class="btn gold exbtn" id="exBtn">Show explanation for this topic</button>` : ''}
   </div></section>
   <div class="qwrap pad playing">
