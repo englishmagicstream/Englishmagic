@@ -389,7 +389,7 @@ function viewHome() {
   main.replaceChildren(v);
   const bq = $('#bigQ');
   const bdrop = searchBox(bq);
-  $('#bigForm').onsubmit = e => { e.preventDefault(); bdrop.pick(); };
+  $('#bigForm').onsubmit = e => { e.preventDefault(); bq.focus(); bdrop.pick(); };
   window.scrollTo(0, 0);
 }
 function tile(href, name, list) {
@@ -596,7 +596,7 @@ function startDeck(d, idx) {
   // every visit starts over: nothing from an earlier visit is kept
   S = { d, idx: 0, step: 0, answers: {} };
   if (idx != null) S.idx = Math.max(0, Math.min(idx, d.items.length - 1));
-  S.mode = d.nMC && !idx ? 'test' : 'practice';
+  S.mode = idx ? 'practice' : null;
   renderQuiz();
   if (idx) return;
   if (d.ex.length) askExplain(d, () => askMode(d));
@@ -604,7 +604,7 @@ function startDeck(d, idx) {
 }
 // Test: no answers until the end. Practice: answer and reason after each question.
 function askMode(d) {
-  if (!d.nMC) { S.mode = 'practice'; return; }
+  if (!d.nMC) { S.mode = 'practice'; return renderQuiz(); }
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
   ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>How do you want to take this set?</h3>
     <div class="modes"><button id="mTest"><b>Test</b><span>Answer every question first, then see your score and the answers at the end.</span></button>
@@ -695,7 +695,7 @@ function renderQuiz() {
   const v = document.createElement('div');
   v.innerHTML = `<section class="band pad"><div class="wrap narrow">
     <div class="crumb"><a href="#">Home</a><span>/</span><a href="${catHref(d.cat)}">${esc(d.cat)}</a>${d.sub ? `<span>/</span><a href="${catHref(d.cat, d.sub)}">${esc(d.sub)}</a>` : ''}</div>
-    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC && S.mode !== 'test' ? `<div class="score">Score <b>${sc.t ? Math.round(sc.s / sc.t * 100) : 0}%</b> (${sc.s}/${sc.t})</div>` : ''}</div>
+    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC && S.mode && S.mode !== 'test' ? `<div class="score">Score <b>${sc.t ? Math.round(sc.s / sc.t * 100) : 0}%</b> (${sc.s}/${sc.t})</div>` : ''}</div>
     ${d.ex.length ? `<button class="btn gold exbtn" id="exBtn">Show explanation for this topic</button>` : ''}
   </div></section>
   <div class="qwrap pad playing">
@@ -705,6 +705,7 @@ function renderQuiz() {
     <div class="qnav"><div class="in"><button class="btn" id="back">← Back</button><span class="r" id="right"></span></div></div></div>`;
   main.replaceChildren(v);
   if (d.ex.length) $('#exBtn').onclick = () => openExplain(d);
+  if (!S.mode) { $('.qwrap', v).remove(); return; }
   const card = $('#card'), right = $('#right');
   $('#back').disabled = S.idx === 0;
   $('#back').onclick = () => move(-1);
@@ -848,7 +849,7 @@ function renderResult() {
       ${missed.length ? `<div class="missed"><h3>Questions you missed</h3>${missed.map(it => `<button data-j="${it.j}"><span class="qnum">QUESTION ${d.items.filter(x => x.t !== 'info' && !x.L).indexOf(it) + 1}</span><br><span class="mq">${it.q.replace(/<span class="blank"><\/span>/, '<span class="blank fill"><em>' + esc(strip(it.o[it.k])) + '</em></span>')}</span>${(it.c || []).map(c => `<span class="mc">${c}</span>`).join('')}<span class="ma yours">✗ Your answer: ${esc(it.l[S.answers[it.j].pick])}  ${esc(strip(it.o[S.answers[it.j].pick]))}</span><span class="ma right">✓ Answer: ${esc(it.l[it.k])}  ${esc(strip(it.o[it.k]))}</span>${(it.x || []).length ? `<span class="mx">${it.x.map(x => markExpl(it, x)).join('<br>')}</span>` : ''}</button>`).join('')}</div>` : ''}
     </div></div>`;
   main.replaceChildren(v);
-  $('#again').onclick = () => { S.answers = {}; S.idx = 0; S.step = 0; S.mode = d.nMC ? 'test' : 'practice'; renderQuiz(); askMode(d); };
+  $('#again').onclick = () => { S.answers = {}; S.idx = 0; S.step = 0; S.mode = null; renderQuiz(); askMode(d); };
   v.querySelectorAll('.missed button').forEach(b => b.onclick = () => { S.idx = +b.dataset.j; renderQuiz(); });
   history.replaceState(null, '', '#' + d.slug);
   window.scrollTo(0, 0);
@@ -889,15 +890,15 @@ function dropShow(input) {
   sdrop.input = input;
   const t = input.value.trim();
   if (!t) return dropHide();
-  sdrop.hits = findSets(t); sdrop.on = 0; dropDraw(); dropPlace(); sdrop.box.hidden = false;
+  sdrop.hits = findSets(t); sdrop.on = -1; dropDraw(); dropPlace(); sdrop.box.hidden = false;
 }
-function dropPick(input) { if (sdrop.box.hidden || sdrop.input !== input) dropShow(input); if (sdrop.hits.length) dropOpen(sdrop.hits[sdrop.on]); }
+function dropPick(input) { if (sdrop.box.hidden || sdrop.input !== input) return dropShow(input); if (sdrop.on >= 0 && sdrop.hits[sdrop.on]) dropOpen(sdrop.hits[sdrop.on]); }
 function searchBox(input) {
   input.addEventListener('input', () => dropShow(input));
   input.addEventListener('focus', () => dropShow(input));
   input.addEventListener('blur', () => { clearTimeout(sdrop.hideT); sdrop.hideT = setTimeout(dropHide, 120); });
   input.addEventListener('keydown', e => {
-    const n = sdrop.hits.length, step = d => { e.preventDefault(); sdrop.on = (sdrop.on + d + n) % n; dropDraw(); sdrop.box.children[sdrop.on].scrollIntoView({ block: 'nearest' }); };
+    const n = sdrop.hits.length, step = d => { e.preventDefault(); sdrop.on = sdrop.on < 0 ? (d > 0 ? 0 : n - 1) : (sdrop.on + d + n) % n; dropDraw(); sdrop.box.children[sdrop.on].scrollIntoView({ block: 'nearest' }); };
     if (e.key === 'Enter') { e.preventDefault(); dropPick(input); }
     else if (sdrop.box.hidden || !n) return;
     else if (e.key === 'ArrowDown') step(1);
