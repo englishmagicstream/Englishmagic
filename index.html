@@ -613,7 +613,7 @@ function askMode(d) {
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
   ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>How do you want to take this set?</h3>
     <div class="modes"><button id="mTest"><b>Test</b><span>Answer every question first, then see your score and the answers at the end.</span></button>
-    <button id="mPrac"><b>Practice</b><span>See the answer and the reason after each question.</span></button></div></div>`;
+    <button id="mPrac"><b>Practice</b><span>See the answer after each question.</span></button></div></div>`;
   document.body.appendChild(ov);
   const set = m => { ov.remove(); S.mode = m; renderQuiz(); };
   ov.close = () => set('practice');
