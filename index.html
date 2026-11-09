@@ -204,6 +204,8 @@ h2{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.
 .modes span{color:var(--muted);font-size:14.5px;line-height:1.45}
 .opt .mark{font-family:var(--f-body);font-size:13px;font-weight:600}
 .opt.right .mark{color:var(--good)} .opt.wrong .mark{color:var(--bad)}
+.opt.close{border-color:var(--gold);background:#3A3524} .opt.close .lab{background:var(--gold);color:var(--gold-ink)} .opt.close .mark{color:var(--gold)}
+.verdict.close{color:var(--gold)} .expl.wx.close div{border-left-color:var(--gold)}
 .verdict{margin-top:18px;font-weight:600;font-size:16px}
 .verdict.good{color:var(--good)} .verdict.bad{color:var(--bad)}
 .ans{margin-top:18px;border-left:4px solid var(--gold);background:var(--bg);border-radius:0 10px 10px 0;padding:14px 16px;font-family:var(--f-q);font-size:19px;line-height:1.45}
@@ -773,19 +775,26 @@ function renderQuiz() {
   }
   function showMC(st) {
     const bs = card.querySelectorAll('.opt');
+    // "Both" questions: picking one of the two forms is still correct English
+    const alsoOk = st.pick != null && !st.ok && /^both$/i.test(strip(it.o[it.k]).trim());
     bs.forEach((b, i) => {
       b.disabled = true;
       if (i === it.k) { b.classList.add('right'); b.querySelector('.mark').textContent = st.pick === i ? '✓ Correct' : '✓ Answer'; }
-      else if (i === st.pick) { b.classList.add('wrong'); b.querySelector('.mark').textContent = '✗ Your answer'; }
+      else if (i === st.pick) { b.classList.add(alsoOk ? 'close' : 'wrong'); b.querySelector('.mark').textContent = alsoOk ? 'Your answer' : '✗ Your answer'; }
       else b.classList.add('dim');
     });
     // fill the blank with the right answer
     const bl = card.querySelector('#qtext .blank');
-    if (bl) { bl.classList.add('fill'); bl.innerHTML = '<em>' + strip(it.o[it.k]) + '</em>'; }
+    if (bl) {
+      bl.classList.add('fill');
+      // a "Both" answer is not a word that fits the blank: show the student's form, or the two forms
+      const isBoth = /^both$/i.test(strip(it.o[it.k]).trim());
+      bl.innerHTML = '<em>' + (!isBoth ? strip(it.o[it.k]) : alsoOk ? strip(it.o[st.pick]) : it.o.filter((_, i) => i !== it.k).map(strip).join(' / ')) + '</em>';
+    }
     const v = document.createElement('div');
-    if (st.pick != null) { v.className = 'verdict ' + (st.ok ? 'good' : 'bad'); v.textContent = st.ok ? 'Correct!' : 'Not quite. The answer is ' + (it.k + 1) + ': ' + strip(it.o[it.k]).trim().replace(/[.!?]$/, '') + '.'; card.appendChild(v); }
+    if (st.pick != null) { v.className = 'verdict ' + (st.ok ? 'good' : alsoOk ? 'close' : 'bad'); v.innerHTML = st.ok ? 'Correct!' : alsoOk ? 'Close! Although <em>' + strip(it.o[st.pick]).trim() + '</em> is correct, both can be used here.' : esc('Not quite. The answer is ' + (it.k + 1) + ': ' + strip(it.o[it.k]).trim().replace(/[.!?]$/, '') + '.'); card.appendChild(v); }
     const wrongNote = st.pick != null && !st.ok && it.w && it.w[st.pick];
-    if (wrongNote) card.insertAdjacentHTML('beforeend', `<div class="expl wx"><div>${it.w[st.pick]}</div></div>`);
+    if (wrongNote) card.insertAdjacentHTML('beforeend', `<div class="expl wx${alsoOk ? ' close' : ''}"><div>${it.w[st.pick]}</div></div>`);
     else if (it.x && it.x.length) card.insertAdjacentHTML('beforeend', `<div class="expl">${it.x.map((x, i) => `<div>${markExpl(it, x)}</div>`).join('')}</div>`);
   }
   function showReveal() {
