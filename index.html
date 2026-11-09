@@ -194,6 +194,14 @@ h2{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.
 .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
 .opt.wrong .lab{background:var(--bad);color:#fff}
 .opt.dim{opacity:.55}
+.opt.picked{border-color:var(--brand);background:var(--chip)}
+.opt.picked .lab{background:var(--brand);color:#fff}
+.opt.picked .mark{color:var(--ink)}
+.modes{display:grid;gap:10px;margin-top:14px;text-align:left}
+.modes button{border:2px solid var(--line);background:var(--bg);border-radius:12px;padding:14px 16px;cursor:pointer;display:grid;gap:4px}
+.modes button:hover,.modes button:focus-visible{border-color:var(--brand)}
+.modes b{font-family:var(--f-display);font-size:19px}
+.modes span{color:var(--muted);font-size:14.5px;line-height:1.45}
 .opt .mark{font-family:var(--f-body);font-size:13px;font-weight:600}
 .opt.right .mark{color:var(--good)} .opt.wrong .mark{color:var(--bad)}
 .verdict{margin-top:18px;font-weight:600;font-size:16px}
@@ -588,20 +596,53 @@ function startDeck(d, idx) {
   // every visit starts over: nothing from an earlier visit is kept
   S = { d, idx: 0, step: 0, answers: {} };
   if (idx != null) S.idx = Math.max(0, Math.min(idx, d.items.length - 1));
+  S.mode = d.nMC && !idx ? 'test' : 'practice';
   renderQuiz();
-  if (d.ex.length && S.idx === 0 && !Object.keys(S.answers).length) askExplain(d);
+  if (idx) return;
+  if (d.ex.length) askExplain(d, () => askMode(d));
+  else askMode(d);
+}
+// Test: no answers until the end. Practice: answer and reason after each question.
+function askMode(d) {
+  if (!d.nMC) { S.mode = 'practice'; return; }
+  const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
+  ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>How do you want to take this set?</h3>
+    <div class="modes"><button id="mTest"><b>Test</b><span>Answer every question first, then see your score and the answers at the end.</span></button>
+    <button id="mPrac"><b>Practice</b><span>See the answer and the reason after each question.</span></button></div></div>`;
+  document.body.appendChild(ov);
+  const set = m => { ov.remove(); S.mode = m; renderQuiz(); };
+  ov.close = () => set('practice');
+  $('#mTest').onclick = () => set('test');
+  $('#mPrac').onclick = () => set('practice');
+  $('#mTest').focus();
+}
+function confirmFinish(left) {
+  const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
+  ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>You have ${left} unanswered question${left === 1 ? '' : 's'}. Finish anyway?</h3>
+    <div class="exbtns"><button class="btn" id="fBack">Go back</button><button class="btn primary" id="fGo">Finish</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.close = () => ov.remove();
+  $('#fBack').onclick = () => ov.remove();
+  $('#fGo').onclick = () => { ov.remove(); finishTest(true); };
+  $('#fBack').focus();
+}
+function finishTest(force) {
+  const left = S.d.items.filter(it => it.t === 'mc' && !(S.answers[it.j] && S.answers[it.j].pick != null)).length;
+  if (left && !force) return confirmFinish(left);
+  S.mode = 'review'; S.idx = S.d.items.length; renderResult();
 }
 // ---------- explanation frame ----------
-function askExplain(d) {
+function askExplain(d, then) {
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
   ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>Would you like a short explanation?</h3>
     <div class="exbtns"><button class="btn primary" id="exYes">Yes</button><button class="btn" id="exNo">No</button></div></div>`;
   document.body.appendChild(ov);
-  $('#exYes').onclick = () => { ov.remove(); openExplain(d); };
-  $('#exNo').onclick = () => ov.remove();
+  ov.close = () => { ov.remove(); then && then(); };
+  $('#exYes').onclick = () => { ov.remove(); openExplain(d, 0, then); };
+  $('#exNo').onclick = ov.close;
   $('#exYes').focus();
 }
-function openExplain(d, at = 0) {
+function openExplain(d, at = 0, then) {
   document.getElementById('exov')?.remove();
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
   ov.innerHTML = `<div class="expanel" role="dialog" aria-modal="true">
@@ -609,6 +650,7 @@ function openExplain(d, at = 0) {
     <div class="exslide" id="exSlide"></div>
     <div class="exbtns"><button class="btn" id="exBack">← Back</button><button class="btn primary" id="exNext">Next →</button></div></div>`;
   document.body.appendChild(ov);
+  ov.close = () => { ov.remove(); then && then(); };
   // lesson sets (d.exs) play each slide step by step, like the PowerPoint; others show each slide complete
   let n = at, step = 0, el = null;
   const steps = () => d.exs ? d.ex[n].sl.k.length : 0;
@@ -627,14 +669,14 @@ function openExplain(d, at = 0) {
   ov.exStep = dir => {
     if (dir > 0 && step < steps()) { step++; applyLesson(el, d, d.ex[n].sl, step); return label(); }
     if (dir < 0 && step > 0) { step--; applyLesson(el, d, d.ex[n].sl, step); return label(); }
-    if (dir > 0 && n === d.ex.length - 1) return ov.remove();
+    if (dir > 0 && n === d.ex.length - 1) return ov.close();
     if (dir < 0 && n === 0) return;
     n += dir; step = dir < 0 ? steps() : 0; draw();
   };
   $('#exBack').onclick = () => ov.exStep(-1);
   $('#exNext').onclick = () => ov.exStep(1);
-  $('#exClose').onclick = () => ov.remove();
-  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  $('#exClose').onclick = ov.close;
+  ov.onclick = e => { if (e.target === ov) ov.close(); };
   draw();
 }
 function save() {}
@@ -653,7 +695,7 @@ function renderQuiz() {
   const v = document.createElement('div');
   v.innerHTML = `<section class="band pad"><div class="wrap narrow">
     <div class="crumb"><a href="#">Home</a><span>/</span><a href="${catHref(d.cat)}">${esc(d.cat)}</a>${d.sub ? `<span>/</span><a href="${catHref(d.cat, d.sub)}">${esc(d.sub)}</a>` : ''}</div>
-    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC ? `<div class="score">Score <b>${sc.s}</b> / ${sc.t}</div>` : ''}</div>
+    <div class="qhead"><h2>${esc(d.title)}</h2>${d.nMC && S.mode !== 'test' ? `<div class="score">Score <b>${sc.s}</b> / ${d.nMC}</div>` : ''}</div>
     ${d.ex.length ? `<button class="btn gold exbtn" id="exBtn">Show explanation for this topic</button>` : ''}
   </div></section>
   <div class="qwrap pad playing">
@@ -667,7 +709,7 @@ function renderQuiz() {
   $('#back').disabled = S.idx === 0;
   $('#back').onclick = () => move(-1);
   const st = S.answers[it.j] || {};
-  const nextBtn = (label = 'Next →') => { const b = document.createElement('button'); b.className = 'btn primary'; b.id = 'next'; b.textContent = S.idx === d.items.length - 1 ? (d.nMC ? 'See my score' : 'Finish') : label; b.onclick = () => move(1); return b; };
+  const nextBtn = (label = 'Next →') => { const b = document.createElement('button'); b.className = 'btn primary'; b.id = 'next'; const lastTest = S.mode === 'test' && S.idx === d.items.length - 1; b.textContent = lastTest ? 'Finish test' : S.idx === d.items.length - 1 ? (d.nMC ? 'See my score' : 'Finish') : label; b.onclick = () => lastTest ? finishTest() : move(1); return b; };
 
   if (it.L) {
     const sl = it.sl, total = sl.k.length;
@@ -700,10 +742,12 @@ function renderQuiz() {
       });
       body.appendChild(opts);
       const done = st.pick != null || st.shown;
-      if (done) showMC(st);
+      if (S.mode === 'test') {
+        if (st.pick != null) card.querySelectorAll('.opt').forEach((b, i) => { b.disabled = true; if (i === st.pick) { b.classList.add('picked'); b.querySelector('.mark').textContent = 'Your answer'; } else b.classList.add('dim'); });
+      } else if (done) showMC(st);
       else { const sa = document.createElement('button'); sa.className = 'btn'; sa.textContent = 'Show answer'; sa.onclick = () => { S.answers[it.j] = { shown: true }; save(); renderQuiz(); }; right.appendChild(sa); }
       const last = S.idx === d.items.length - 1;
-      if (done || !last) right.appendChild(nextBtn(done ? 'Next →' : 'Skip →'));
+      if (done || !last || S.mode === 'test') right.appendChild(nextBtn(done ? 'Next →' : 'Skip →'));
       if (!done && !last) $('#next').classList.remove('primary');
     } else if (it.t === 'reveal') {
       if (st.shown) showReveal();
@@ -804,7 +848,7 @@ function renderResult() {
       ${missed.length ? `<div class="missed"><h3>Questions you missed</h3>${missed.map(it => `<button data-j="${it.j}"><span class="qnum">QUESTION ${d.items.filter(x => x.t !== 'info' && !x.L).indexOf(it) + 1}</span><br><span class="mq">${it.q.replace(/<span class="blank"><\/span>/, '<span class="blank fill"><em>' + esc(strip(it.o[it.k])) + '</em></span>')}</span>${(it.c || []).map(c => `<span class="mc">${c}</span>`).join('')}<span class="ma yours">✗ Your answer: ${esc(it.l[S.answers[it.j].pick])}  ${esc(strip(it.o[S.answers[it.j].pick]))}</span><span class="ma right">✓ Answer: ${esc(it.l[it.k])}  ${esc(strip(it.o[it.k]))}</span>${(it.x || []).length ? `<span class="mx">${it.x.map(x => markExpl(it, x)).join('<br>')}</span>` : ''}</button>`).join('')}</div>` : ''}
     </div></div>`;
   main.replaceChildren(v);
-  $('#again').onclick = () => { S.answers = {}; S.idx = 0; save(); renderQuiz(); };
+  $('#again').onclick = () => { S.answers = {}; S.idx = 0; S.step = 0; S.mode = d.nMC ? 'test' : 'practice'; renderQuiz(); askMode(d); };
   v.querySelectorAll('.missed button').forEach(b => b.onclick = () => { S.idx = +b.dataset.j; renderQuiz(); });
   history.replaceState(null, '', '#' + d.slug);
   window.scrollTo(0, 0);
@@ -889,7 +933,7 @@ window.addEventListener('hashchange', route);
 document.addEventListener('keydown', e => {
   const ov = document.getElementById('exov');
   if (ov) {
-    if (e.key === 'Escape') ov.remove();
+    if (e.key === 'Escape') (ov.close || ov.remove).call(ov);
     else if (ov.exStep && e.key === 'ArrowRight') { e.preventDefault(); ov.exStep(1); }
     else if (ov.exStep && e.key === 'ArrowLeft') { e.preventDefault(); ov.exStep(-1); }
     return;
