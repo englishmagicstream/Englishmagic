@@ -57,12 +57,12 @@ header.top .wrap{display:flex;align-items:center;gap:24px;height:64px}
 .av-day:first-child{border-left:0}
 .av-day h3{margin:0;padding:14px 6px;text-align:center;font-family:var(--f-mono);font-size:12.5px;letter-spacing:.1em;border-bottom:1px solid var(--line)}
 .av-day ul{list-style:none;margin:0;padding:8px;display:flex;flex-direction:column;gap:6px}
-.av-day li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:6px;padding:6px 9px;border-radius:7px;font-size:14px;background:var(--chip);color:var(--muted);opacity:.75}
+.av-day li{display:flex;flex-direction:column;align-items:flex-start;padding:6px 9px;border-radius:7px;font-size:14px;background:var(--chip);color:var(--muted);opacity:.75}
 .av-day li span{white-space:nowrap}
 .av-day li small{font-size:10.5px}
 .av-day li.open{opacity:1;background:var(--good-bg);border:1.5px solid var(--good);color:var(--good);font-weight:600}
 .av-day li.open small{font-weight:500}
-.av-day li.none{justify-content:center;background:none;border:1.5px dashed var(--line);opacity:1}
+.av-day li.none{align-items:center;background:none;border:1.5px dashed var(--line);opacity:1}
 @media (max-width:860px){
   .av-grid{grid-template-columns:1fr}
   .av-day{border-left:0;border-top:1px solid var(--line)}
