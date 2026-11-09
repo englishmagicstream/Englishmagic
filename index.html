@@ -685,10 +685,14 @@ function openExplain(d, at = 0, then) {
   draw();
 }
 function save() {}
+// a "Close!" answer (another correct form, or one half of a "Both") is not scored either way
+function isClose(it, a) {
+  return !!(a && a.pick != null && !a.ok && (/^both$/i.test(strip(it.o[it.k]).trim()) || (it.ok || []).includes(a.pick)));
+}
 function scoreNow() {
-  let s = 0, t = 0;
-  for (const it of S.d.items) if (it.t === 'mc') { const a = S.answers[it.j]; if (a && a.pick != null) { t++; if (a.ok) s++; } }
-  return { s, t };
+  let s = 0, t = 0, c = 0;
+  for (const it of S.d.items) if (it.t === 'mc') { const a = S.answers[it.j]; if (isClose(it, a)) c++; else if (a && a.pick != null) { t++; if (a.ok) s++; } }
+  return { s, t, c };
 }
 function renderQuiz() {
   const d = S.d, it = d.items[S.idx];
@@ -847,18 +851,18 @@ function move(dir) {
 }
 function renderResult() {
   const d = S.d, sc = scoreNow();
-  const total = d.nMC;
+  const total = d.nMC - sc.c;
   if (total) {
     const best = store.get('best:' + d.slug);
     if (!best || sc.s > best.s) store.set('best:' + d.slug, { s: sc.s, t: total });
   }
-  const missed = d.items.filter(it => it.t === 'mc' && S.answers[it.j] && S.answers[it.j].pick != null && !S.answers[it.j].ok);
+  const missed = d.items.filter(it => it.t === 'mc' && S.answers[it.j] && S.answers[it.j].pick != null && !S.answers[it.j].ok && !isClose(it, S.answers[it.j]));
   const v = document.createElement('div');
   v.innerHTML = `<section class="band pad"><div class="wrap narrow">
     <div class="crumb"><a href="#">Home</a><span>/</span><a href="${catHref(d.cat)}">${esc(d.cat)}</a></div>
     <div class="qhead"><h2>${esc(d.title)}</h2></div></div></section>
     <div class="qwrap pad"><div class="card result">${total ? `<div class="eyebrow" style="color:var(--muted)">Your score</div>
-      <div class="big">${sc.s} / ${total}</div><div class="pct">${Math.round(sc.s / total * 100)}% correct${sc.t < total ? ` · ${total - sc.t} skipped` : ''}</div>`
+      <div class="big">${sc.s} / ${total}</div><div class="pct">${Math.round(sc.s / total * 100)}% correct${sc.t < total ? ` · ${total - sc.t} skipped` : ''}${sc.c ? ` · ${sc.c} close (not scored)` : ''}</div>`
       : `<div class="big" style="font-size:40px">Finished!</div><div class="pct">${d.nQ} questions</div>`}
       <div class="nav"><button class="btn primary" id="again">Try again</button></div>
       ${missed.length ? `<div class="missed"><h3>Questions you missed</h3>${missed.map(it => `<button data-j="${it.j}"><span class="qnum">QUESTION ${d.items.filter(x => x.t !== 'info' && !x.L).indexOf(it) + 1}</span><br><span class="mq">${it.q.replace(/<span class="blank"><\/span>/, '<span class="blank fill"><em>' + esc(strip(it.o[it.k])) + '</em></span>')}</span>${(it.c || []).map(c => `<span class="mc">${c}</span>`).join('')}<span class="ma yours">✗ Your answer: ${esc(it.l[S.answers[it.j].pick])}  ${esc(strip(it.o[S.answers[it.j].pick]))}</span>${it.w && it.w[S.answers[it.j].pick] ? `<span class="mw">${it.w[S.answers[it.j].pick]}</span>` : ''}<span class="ma right">✓ Answer: ${esc(it.l[it.k])}  ${esc(strip(it.o[it.k]))}</span>${!(it.w && it.w[S.answers[it.j].pick]) && (it.x || []).length ? `<span class="mx">${it.x.map(x => markExpl(it, x)).join('<br>')}</span>` : ''}</button>`).join('')}</div>` : ''}
