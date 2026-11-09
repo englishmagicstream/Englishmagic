@@ -747,7 +747,8 @@ function renderQuiz() {
       body.appendChild(opts);
       const done = st.pick != null || st.shown;
       if (S.mode === 'test') {
-        if (st.pick != null) card.querySelectorAll('.opt').forEach((b, i) => { b.disabled = true; if (i === st.pick) { b.classList.add('picked'); b.querySelector('.mark').textContent = 'Your answer'; } else b.classList.add('dim'); });
+        // Test: nothing is revealed yet, so the answer can still be changed
+        if (st.pick != null) card.querySelectorAll('.opt').forEach((b, i) => { if (i === st.pick) { b.classList.add('picked'); b.querySelector('.mark').textContent = 'Your answer'; } });
       } else if (done) showMC(st);
       else { const sa = document.createElement('button'); sa.className = 'btn'; sa.textContent = 'Show answer'; sa.onclick = () => { S.answers[it.j] = { shown: true }; save(); renderQuiz(); }; right.appendChild(sa); }
       const last = S.idx === d.items.length - 1;
@@ -767,7 +768,7 @@ function renderQuiz() {
   window.scrollTo(0, 0);
 
   function pick(i) {
-    if (S.answers[it.j] && (S.answers[it.j].pick != null || S.answers[it.j].shown)) return;
+    if (S.mode !== 'test' && S.answers[it.j] && (S.answers[it.j].pick != null || S.answers[it.j].shown)) return;
     S.answers[it.j] = { pick: i, ok: i === it.k }; save(); renderQuiz();
   }
   function showMC(st) {
