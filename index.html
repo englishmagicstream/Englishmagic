@@ -372,6 +372,7 @@ function viewHome() {
     <div class="badge"><img src="${LOGO_BIG}" alt="ESL Tour"></div>
   </div></section>
   <div class="pad"><div class="wrap">
+    <div id="resSlot"></div>
     <div id="todaySlot"></div>
     <section class="sec"><div class="sec-h"><h2>Browse by topic</h2></div>
       <div class="topics" id="topics"></div></section>
@@ -389,7 +390,7 @@ function viewHome() {
   main.replaceChildren(v);
   const bq = $('#bigQ');
   const bdrop = searchBox(bq);
-  $('#bigForm').onsubmit = e => { e.preventDefault(); bq.focus(); bdrop.pick(); };
+  $('#bigForm').onsubmit = e => { e.preventDefault(); bdrop.pick(); };
   window.scrollTo(0, 0);
 }
 function tile(href, name, list) {
@@ -894,18 +895,25 @@ function dropShow(input) {
 }
 function dropPick(input) { if (sdrop.box.hidden || sdrop.input !== input) return dropShow(input); if (sdrop.on >= 0 && sdrop.hits[sdrop.on]) dropOpen(sdrop.hits[sdrop.on]); }
 function searchBox(input) {
-  input.addEventListener('input', () => dropShow(input));
-  input.addEventListener('focus', () => dropShow(input));
-  input.addEventListener('blur', () => { clearTimeout(sdrop.hideT); sdrop.hideT = setTimeout(dropHide, 120); });
-  input.addEventListener('keydown', e => {
-    const n = sdrop.hits.length, step = d => { e.preventDefault(); sdrop.on = sdrop.on < 0 ? (d > 0 ? 0 : n - 1) : (sdrop.on + d + n) % n; dropDraw(); sdrop.box.children[sdrop.on].scrollIntoView({ block: 'nearest' }); };
-    if (e.key === 'Enter') { e.preventDefault(); dropPick(input); }
-    else if (sdrop.box.hidden || !n) return;
-    else if (e.key === 'ArrowDown') step(1);
-    else if (e.key === 'ArrowUp') step(-1);
-    else if (e.key === 'Escape') dropHide();
-  });
-  return { show: () => dropShow(input), pick: () => dropPick(input) };
+  // nothing shows while typing; Enter (or the Search button) lists the matching sets on the home page
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doSearch(input.value); } });
+  input.addEventListener('input', () => { if (!input.value.trim()) clearResults(); });
+  return { pick: () => doSearch(input.value) };
+}
+function doSearch(text) {
+  const t = text.trim();
+  if (!t) return clearResults();
+  if (document.getElementById('resSlot')) showResults(t);
+  else go('search-' + encodeURIComponent(t));
+}
+function clearResults() { const r = document.getElementById('resSlot'); if (r) r.replaceChildren(); }
+function showResults(t) {
+  const slot = document.getElementById('resSlot'); if (!slot) return;
+  const hits = findSets(t);
+  slot.innerHTML = `<section class="sec"><div class="sec-h"><h2>${hits.length ? `${hits.length} ${hits.length === 1 ? 'set' : 'sets'} for “${esc(t)}”` : `No sets for “${esc(t)}”`}</h2></div>
+    ${hits.length ? '<div class="decks" id="resList"></div>' : '<p class="empty">Try a shorter word, like “since” or “phrasal”.</p>'}</section>`;
+  if (hits.length) $('#resList', slot).append(...hits.map(setCard));
+  slot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 window.addEventListener('scroll', () => { if (!sdrop.box.hidden) dropPlace(); }, { passive: true });
 window.addEventListener('resize', () => { if (!sdrop.box.hidden) dropPlace(); });
@@ -921,7 +929,7 @@ function route() {
   if (h === 'availability') return viewAvail();
   if (h.startsWith('topic-')) { const [c, x] = h.slice(6).split('/'); return viewBrowse(null, c, x); }
   if (h.startsWith('level-')) { const [b, c, x] = h.slice(6).split('/'); if (BANDS.includes(b.toUpperCase())) return viewBrowse(b.toUpperCase(), c, x); }
-  if (h.startsWith('search-')) { viewHome(); const bq = $('#bigQ'); bq.value = h.slice(7).replace(/-/g, ' '); bq.focus(); return; }
+  if (h.startsWith('search-')) { viewHome(); const t = h.slice(7); $('#bigQ').value = t; showResults(t); return; }
   let m = h.match(/^(.*)-q(\d+)$/);
   if (m && bySlug[m[1]]) return startDeck(bySlug[m[1]], +m[2] - 1);
   m = h.match(/^(.*)-done$/);
