@@ -843,8 +843,7 @@ function startDeck(d, idx) {
   S.mode = idx ? 'practice' : null;
   renderQuiz();
   if (idx) return;
-  if (d.ex.length) askExplain(d, () => askMode(d));
-  else askMode(d);
+  askMode(d);
 }
 // Test: no answers until the end. Practice: answer and reason after each question.
 function askMode(d) {
@@ -876,16 +875,6 @@ function finishTest(force) {
   S.mode = 'review'; S.idx = S.d.items.length; renderResult();
 }
 // ---------- explanation frame ----------
-function askExplain(d, then) {
-  const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
-  ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>Would you like a short explanation?</h3>
-    <div class="exbtns"><button class="btn primary" id="exYes">Yes</button><button class="btn" id="exNo">No</button></div></div>`;
-  document.body.appendChild(ov);
-  ov.close = () => { ov.remove(); then && then(); };
-  $('#exYes').onclick = () => { ov.remove(); openExplain(d, 0, then); };
-  $('#exNo').onclick = ov.close;
-  $('#exYes').focus();
-}
 function openExplain(d, at = 0, then) {
   document.getElementById('exov')?.remove();
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
