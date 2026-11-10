@@ -318,6 +318,8 @@ h2{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.
 .sres{display:grid;gap:10px}
 .bylevel{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.8)}
 .bylevel a{display:inline-block;min-width:40px;text-align:center;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:5px 14px;font-weight:600;text-decoration:none}
+.bylevel a.bl-test{margin-left:10px;background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.bylevel a.bl-test:hover{filter:brightness(1.08)}
 .bylevel a:hover{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
 .sdrop{position:fixed;z-index:60;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.22);max-height:min(60vh,460px);overflow:auto;padding:6px;text-align:left}
 .sdrop button{display:block;width:100%;text-align:left;border:0;background:none;color:inherit;border-radius:8px;padding:9px 12px;cursor:pointer;font:inherit}
@@ -448,7 +450,7 @@ function viewHome() {
         <input id="bigQ" type="search" placeholder="Search a topic, like “since” or “passive”" autocomplete="off" aria-label="Search topics">
         <button type="submit">Search</button>
       </form>
-      <div class="bylevel">or search by level: ${BANDS.map(b => `<a href="${catHref(null, null, b)}">${BAND_LABEL[b]}</a>`).join('')}</div>
+      <div class="bylevel">or search by level: ${BANDS.map(b => `<a href="${catHref(null, null, b)}">${BAND_LABEL[b]}</a>`).join('')}<a class="bl-test" href="#test-your-level">Test Your Level →</a></div>
       <div class="reqlink">Can't find a topic? <a href="#" id="reqHome">Request a presentation</a></div>
     </div>
     <div class="badge"><img src="${LOGO_BIG}" alt="ESL Tour"></div>
