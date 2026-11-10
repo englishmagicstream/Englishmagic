@@ -90,6 +90,7 @@ header.top .wrap{display:flex;align-items:center;gap:24px;height:64px}
 .ps-t{display:block;margin-top:4px;background:var(--brand);color:#fff;text-decoration:none;font-size:12.5px;line-height:1.25;padding:4px 6px;border-radius:5px}
 a.ps-t:hover{filter:brightness(1.15)}
 .ps-list{display:none}
+.ps-pop-k{margin:0 0 4px;color:var(--muted);font-size:14px}.ps-pop-n{margin:-6px 0 14px;color:var(--muted)}.ps-pop-q{font-size:17px;margin:0 0 16px}
 @media (max-width:640px){.ps-grid{display:none}.ps-list{display:block}
 .ps-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .ps-row .d{color:var(--muted);width:62px;flex:none;font-size:14px}
@@ -538,6 +539,21 @@ function viewStreams(ym) {
     <div class="ps-grid">${g}</div><div class="ps-list">${list}</div>
   </div></div>`;
   main.replaceChildren(v);
+  v.querySelectorAll('a.ps-t').forEach(a => a.onclick = e => {
+    const d = bySlug[a.getAttribute('href').slice(1)]; if (!d) return;
+    e.preventDefault();
+    const day = a.closest('.ps-day')?.querySelector('.n')?.textContent || a.closest('.ps-row')?.querySelector('.d')?.textContent.split(' ')[1];
+    const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
+    ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><p class="ps-pop-k">Stream · ${MONTHS[m - 1]} ${day}, ${y}</p><h3>${esc(d.title)}</h3><p class="ps-pop-n">${d.nQ} questions</p>
+      <p class="ps-pop-q">Would you like to take this test?</p>
+      <div class="exbtns"><button class="btn primary" id="psYes">Yes</button><button class="btn" id="psNo">Not now</button></div></div>`;
+    document.body.appendChild(ov);
+    ov.close = () => ov.remove();
+    ov.onclick = ev => { if (ev.target === ov) ov.remove(); };
+    $('#psYes').onclick = () => { ov.remove(); go(d.slug); };
+    $('#psNo').onclick = () => ov.remove();
+    $('#psYes').focus();
+  });
   $('#psPrev', v).onclick = () => go('streams/' + months[i - 1]);
   $('#psNext', v).onclick = () => go('streams/' + months[i + 1]);
   window.scrollTo(0, 0);
