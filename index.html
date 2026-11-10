@@ -1266,7 +1266,7 @@ function ltRender() {
   <div class="qwrap pad playing">
     <div class="bar"><i style="width:${(idx / Math.max(1, qs.length - 1) * 100).toFixed(1)}%"></i></div>
     <div class="pos"><span>Question ${idx + 1} of ${qs.length}</span><span>${LT_CATS[it.c]}</span></div>
-    <div class="cardrow"><div class="card" id="card"><div class="qnum">QUESTION ${idx + 1}</div><div class="qtext">${ltQ(it.q)}</div>
+    <div class="cardrow"><div class="card lt-q" id="card"><div class="qnum">QUESTION ${idx + 1}</div><div class="qtext">${ltQ(it.q)}</div>
       <div class="opts">${it.o.map((o, i) => `<button class="opt${picks[idx] === i ? ' picked' : ''}" data-i="${i}"><span class="lab">${i + 1}</span><span>${esc(o)}</span><span class="mark">${picks[idx] === i ? 'Your answer' : ''}</span></button>`).join('')}</div></div></div>
     <div class="qnav"><div class="in"><button class="btn" id="back">← Back</button><span class="r"><button class="btn primary" id="next">${last ? 'Finish test' : 'Next →'}</button></span></div></div></div>`;
   main.replaceChildren(v);
@@ -1348,6 +1348,14 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (e.target.tagName === 'INPUT') return;
+  // Test Your Level: 1-4 picks an answer, Enter or → goes on, ← goes back
+  if (document.querySelector('.lt-q')) {
+    const nb = document.getElementById('next'), bb = document.getElementById('back');
+    if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); nb && nb.click(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); if (bb && !bb.disabled) bb.click(); }
+    else if (/^[1-9]$/.test(e.key)) { const b = document.querySelectorAll('.lt-q .opt')[+e.key - 1]; if (b) b.click(); }
+    return;
+  }
   if (!S || !document.getElementById('card')) return;
   const it = S.d.items[S.idx];
   if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); if (document.getElementById('next')) move(1); }
