@@ -870,7 +870,8 @@ function askMode(d) {
     <button id="mPrac"><b>Practice</b><span>See the answer after each question.</span></button></div></div>`;
   document.body.appendChild(ov);
   const set = m => { ov.remove(); S.mode = m; renderQuiz(); };
-  ov.close = () => set('practice');
+  // Escape backs out to the page they came from (home if they arrived straight on this set)
+  ov.close = () => { ov.remove(); if (movedInSite) history.back(); else go(''); };
   $('#mTest').onclick = () => set('test');
   $('#mPrac').onclick = () => set('practice');
   $('#mTest').focus();
@@ -1211,6 +1212,8 @@ searchBox(q);
 $('#navReport').onclick = e => { e.preventDefault(); openReport(null, null, null); };
 $('#navRequest').onclick = e => { e.preventDefault(); openRequest(''); };
 $('#navTeacher').onclick = e => { e.preventDefault(); openTeacher(); };
+let movedInSite = false; // true once the visitor has moved between pages of this site
+window.addEventListener('hashchange', () => { movedInSite = true; });
 window.addEventListener('hashchange', route);
 document.addEventListener('keydown', e => {
   const ov = document.getElementById('exov');
