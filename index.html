@@ -586,19 +586,19 @@ function viewAvail() {
 // ---------- past streams (date, title shown, search term for its sets; no term = no link) ----------
 const STREAMS = [
   ['2026-11-10','Prepositions (B1–B2) – Set 2','#prepositions-b-mix-2'],
-  ['2026-11-09','Who vs Whom','#who-whom-questions'],['2026-11-08','Who vs Whom','#who-whom-questions'],['2026-11-08','Since vs For','#since-vs-for'],
-  ['2026-11-07','In / On – Transportation','#in-on-transportation'],['2026-11-06','Then vs Than','#than-vs-then'],['2026-11-05','Let vs Make','#let-vs-make'],
-  ['2026-11-04','Phrasal Verbs','#phrasal-verbs-2'],['2026-11-04','Inverting Sentences','#inverted-sentences'],['2026-11-03','Inverting Sentences','#inverting-negative-sentences'],
-  ['2026-11-02','Inverting Sentences','#inverted-sentences'],['2026-11-02','Adjectives (C1)','#similar-meanings-2'],['2026-11-02','Adjectives (B1–B2)','#similar-meanings-1'],
-  ['2026-11-01','Idioms – Fill in the Blank','#idioms-5-fill-in-the-blank'],['2026-10-31','A1–A2 Prepositions','#prepositions-a1-a2'],['2026-10-31','Commas – Continued','#does-it-need-commas'],
-  ['2026-10-30','Punctuation','#punctuation'],['2026-10-29','B1–B2 Mix (Eiken Pre-2)','#b1-b2-mixed-4'],['2026-10-28','B1–B2 Mix (Eiken Pre-2)','#b1-b2-mixed-3'],
-  ['2026-10-28','B1–B2 Mix (Eiken Pre-2)','#b1-b2-mixed-2'],['2026-10-27','B1–B2 Mix (Eiken Pre-2)','#b1-b2-mixed-1'],['2026-10-26','Gerund / Infinitive','#gerund-vs-infinitive'],
-  ['2026-10-25','B1 Vocabulary','#b1-vocabulary-1'],['2026-10-24','Conditionals','#conditionals'],['2026-10-23','English on TikTok',''],
-  ['2026-10-23','Viewer’s Choice',''],['2026-10-22','Phrasal Verbs','#phrasal-verbs-1'],['2026-10-21','Inverted Sentences','#inverting-negative-sentences'],
-  ['2026-10-21','Inverted Sentences','#inverted-sentences'],['2026-10-20','Prepositions – Part 2','#prepositions-b-mix-2'],['2026-10-19','Prepositions','#prepositions-b-mix-1'],
-  ['2026-10-18','Among and Between','#among-vs-between'],['2026-10-18','ED and ING Adjectives','#ed-vs-ing-adjectives'],['2026-10-17','Idioms','#idioms-1'],
-  ['2026-10-16','Present Perfect Simple','#present-perfect'],['2026-10-15','Eiken Pre-2 Vocabulary (A2)','#a2-vocabulary-1'],['2026-10-14','In / On / At for Time','#in-on-at-time'],
-  ['2026-10-13','C2 Vocabulary','#c2-vocabulary-1'],['2026-10-12','Eiken 3','#b1-b2-mixed-1'],['2026-10-12','All vs Every','#all-vs-every'],
+  ['2026-11-09','Who vs Whom – Questions','#who-whom-questions'],['2026-11-08','Who vs Whom – Questions','#who-whom-questions'],['2026-11-08','Since vs For','#since-vs-for'],
+  ['2026-11-07','In vs On – Transportation','#in-on-transportation'],['2026-11-06','Than vs Then','#than-vs-then'],['2026-11-05','Let vs Make','#let-vs-make'],
+  ['2026-11-04','Phrasal Verbs (B2) – Set 2','#phrasal-verbs-2'],['2026-11-04','Inversion','#inverted-sentences'],['2026-11-03','Inversion – Negative Sentences','#inverting-negative-sentences'],
+  ['2026-11-02','Inversion','#inverted-sentences'],['2026-11-02','Similar Meanings – Set 2','#similar-meanings-2'],['2026-11-02','Similar Meanings – Set 1','#similar-meanings-1'],
+  ['2026-11-01','Idioms – Fill in the Blank – Set 1','#idioms-5-fill-in-the-blank'],['2026-10-31','Prepositions (A1–A2)','#prepositions-a1-a2'],['2026-10-31','Punctuation – Commas','#does-it-need-commas'],
+  ['2026-10-30','Punctuation','#punctuation'],['2026-10-29','Mixed (B1–B2) – Set 4','#b1-b2-mixed-4'],['2026-10-28','Mixed (B1–B2) – Set 3','#b1-b2-mixed-3'],
+  ['2026-10-28','Mixed (B1–B2) – Set 2','#b1-b2-mixed-2'],['2026-10-27','Mixed (B1–B2) – Set 1','#b1-b2-mixed-1'],['2026-10-26','Gerund vs Infinitive','#gerund-vs-infinitive'],
+  ['2026-10-25','Vocabulary (B1) – Set 1','#b1-vocabulary-1'],['2026-10-24','Conditionals – Set 1','#conditionals'],['2026-10-23','English on TikTok',''],
+  ['2026-10-23','Viewer’s Choice',''],['2026-10-22','Phrasal Verbs (B1) – Set 1','#phrasal-verbs-1'],['2026-10-21','Inversion – Negative Sentences','#inverting-negative-sentences'],
+  ['2026-10-21','Inversion','#inverted-sentences'],['2026-10-20','Prepositions (B1–B2) – Set 2','#prepositions-b-mix-2'],['2026-10-19','Prepositions (B1–B2) – Set 1','#prepositions-b-mix-1'],
+  ['2026-10-18','Among vs Between','#among-vs-between'],['2026-10-18','-ed vs -ing Adjectives','#ed-vs-ing-adjectives'],['2026-10-17','Idioms – Set 1','#idioms-1'],
+  ['2026-10-16','Present Perfect','#present-perfect'],['2026-10-15','Vocabulary (A2) – Set 1','#a2-vocabulary-1'],['2026-10-14','In vs On vs At – Time','#in-on-at-time'],
+  ['2026-10-13','Vocabulary (C2) – Set 1','#c2-vocabulary-1'],['2026-10-12','Mixed (B1–B2) – Set 1','#b1-b2-mixed-1'],['2026-10-12','All vs Every','#all-vs-every'],
 ];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 // Up Next: fixed shuffled order (no topic twice in a row; difficulty spread). Sets streamed later move to the end, oldest first.
