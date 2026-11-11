@@ -72,6 +72,15 @@ header.top .wrap{display:flex;align-items:center;gap:24px;height:64px}
 .cform input:focus,.cform select:focus,.cform textarea:focus{outline:none;border-color:var(--brand)}
 .cform textarea{min-height:140px;resize:vertical}
 .cform .hp{display:none}
+.cfocus{border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0}
+.cform>*,.cform label{min-width:0}.cform select{width:100%;min-width:0;text-overflow:ellipsis}
+.cfocus legend{font-weight:600;padding:0;margin-bottom:8px}
+.cfocus legend small{font-weight:400;color:var(--muted)}
+.cchecks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.cchecks label{display:flex;align-items:center;gap:8px;font-weight:500;background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer}
+.cchecks input{width:18px;height:18px;margin:0;accent-color:var(--brand)}
+.cchecks label:has(input:checked){border-color:var(--brand)}
+.cfocus .status:empty{display:none}
 .cform button{justify-self:start}
 .cform .status{font-weight:600}
 .cform .status.ok{color:var(--good)} .cform .status.err{color:var(--bad)}
@@ -664,7 +673,20 @@ function viewContact(slot) {
       <label>Your name<input name="name" required maxlength="80" autocomplete="name"></label>
       <label>How can I reach you? <small>Email, LINE ID or TikTok name</small><input name="contact" required maxlength="120"></label>
       <input type="hidden" name="lesson_time" value="${esc(pick ? pick.charAt(0) + pick.slice(1).toLowerCase() : 'Not from a lesson slot')}">
-      <label>Message<textarea name="message" required maxlength="2000"></textarea></label>
+      <label>Your current level<select name="level" required>
+        <option value="" selected disabled>Choose one</option>
+        <option>Complete beginner – I know very little English</option>
+        <option>Beginner – I know the basics</option>
+        <option>Intermediate – I can have simple conversations</option>
+        <option>Advanced – I can talk about most topics easily</option>
+        <option>Not sure</option>
+      </select></label>
+      <fieldset class="cfocus"><legend>What would you like to focus on? <small>Choose any</small></legend>
+        <div class="cchecks">${['Conversation','Grammar','Reading','Writing','Listening','Pronunciation','IELTS','IGCSE','Eiken','TOEIC','Business English','Other'].map(x => `<label><input type="checkbox" name="focus" value="${x}"> ${x}</label>`).join('')}</div>
+        <label id="cotherL" hidden>Tell me more<input name="focus_other" maxlength="200"></label>
+        <div class="status err" id="cfocusErr"></div>
+      </fieldset>
+      <label>Message <small>Optional</small><textarea name="message" maxlength="2000"></textarea></label>
       <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
       <button class="btn primary" type="submit" id="csend">Send message</button>
       <div class="status" id="cstatus" role="status"></div>
@@ -672,12 +694,18 @@ function viewContact(slot) {
   </div></div>`;
   main.replaceChildren(v);
   const f = $('#cform'), st = $('#cstatus'), btn = $('#csend');
+  const other = f.querySelector('input[value="Other"]'), otherL = $('#cotherL');
+  other.onchange = () => { otherL.hidden = !other.checked; f.focus_other.required = other.checked; if (other.checked) f.focus_other.focus(); };
+  f.querySelectorAll('input[name="focus"]').forEach(c => c.addEventListener('change', () => { $('#cfocusErr').textContent = ''; }));
   f.onsubmit = async e => {
     e.preventDefault();
     if (f.botcheck.checked) return;
+    const focus = [...f.querySelectorAll('input[name="focus"]:checked')].map(c => c.value);
+    if (!focus.length) { $('#cfocusErr').textContent = 'Please choose at least one.'; f.querySelector('input[name="focus"]').focus(); return; }
     btn.disabled = true; st.className = 'status'; st.textContent = 'Sending…';
     const data = { access_key: W3F_KEY, subject: 'English Magic – new message', from_name: 'English Magic website',
-      name: f.name.value.trim(), contact: f.contact.value.trim(), lesson_time: f.lesson_time.value, message: f.message.value.trim() };
+      name: f.name.value.trim(), contact: f.contact.value.trim(), lesson_time: f.lesson_time.value, level: f.level.value,
+      focus: focus.join(', ') + (other.checked ? ' (' + f.focus_other.value.trim() + ')' : ''), message: f.message.value.trim() || '(no message)' };
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.contact)) data.replyto = data.contact;
     try {
       const r = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
