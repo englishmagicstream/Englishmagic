@@ -367,6 +367,8 @@ footer.site img{width:28px;height:28px;vertical-align:middle;margin-right:8px}
 /* five header links: keep them on one line; the small search box gives way first */
 @media (min-width:861px){.qlinks{flex-wrap:nowrap}.tsearch{flex:1 1 200px;min-width:170px;max-width:320px;width:auto}}
 @media (min-width:861px) and (max-width:1080px){.tsearch{display:none}}
+/* six header links: a little less space around each link on narrower screens so they stay on one line */
+@media (min-width:641px) and (max-width:1080px){.qlinks a{padding:8px 6px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ===== phones and tablets only (screens 860px wide or less). Computer screens never use these rules. ===== */
 @media (max-width:860px){
@@ -442,12 +444,136 @@ footer.site img{width:28px;height:28px;vertical-align:middle;margin-right:8px}
   header.top.open .qlinks a{font-size:16px;padding:12px 10px;text-align:left;border-radius:8px}
   .tsearch{order:5}
 }
+
+/* ---------- study routine (presentation page) ---------- */
+.sr{--blue-bg:#1D3B6E; --blue:#7DB3FF; --pink-bg:#4A2440; --pink:#FF9CC2; --purple-bg:#352B6A; --purple:#BFA8FF; --green-bg:#1B4537; --green:#74DDAA; --orange-bg:#4A3520; --orange:#FFBE7A; --gold-bg:#3A3524;}
+.sr .deck{max-width:980px;margin-inline:auto;padding-block:28px 10px}
+.sr .stage{position:relative;aspect-ratio:16/9;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;cursor:pointer;user-select:none}
+.sr .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 48px;overflow:hidden;text-align:center;opacity:0;visibility:hidden;transition:opacity .45s ease-in,visibility 0s linear .45s}
+.sr .slide.blue .fit,.sr .slide.orange .fit,.sr .slide.pink .fit,.sr .slide.purple .fit,.sr .fit:has(>.list){gap:12px}
+.sr .fit{width:100%;flex:none;display:flex;flex-direction:column;align-items:center;gap:18px;transform-origin:50% 50%}
+.sr .slide.on{opacity:1;visibility:visible;transition:opacity .8s cubic-bezier(.22,.61,.36,1) .3s,visibility 0s}
+@media (prefers-reduced-motion:reduce){.sr .slide,.sr .slide.on{transition:opacity .4s ease}}
+.sr .say{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.6vw,40px);line-height:1.2;letter-spacing:-.02em;margin:0;text-wrap:balance;max-width:24ch}
+.sr .say.title{font-size:clamp(32px,5vw,56px)}
+.sr .say.title em,.sr .say em.hl{font-style:normal;color:var(--gold)}
+.sr .say .rest{font-size:.85em;display:block}
+.sr .nw{white-space:nowrap}
+.sr .res small{white-space:nowrap}
+.sr .say.end{font-size:clamp(34px,5vw,58px);color:var(--gold)}
+.sr .lead{text-wrap:balance;max-width:30ch;font-family:var(--f-display);font-weight:600;font-size:clamp(19px,2.5vw,27px);margin:0;line-height:1.3}
+.sr .lead em{color:var(--gold);font-style:italic}
+.sr .word{font-family:var(--f-q);font-style:italic;font-size:clamp(16px,1.8vw,19px);color:var(--muted);margin:0}
+.sr .plus{font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--muted);line-height:1}
+.sr .ic{width:58px;height:58px;border-radius:50%;background:var(--chip);border:1.5px solid var(--line);display:grid;place-items:center;flex:none;color:var(--ink)}
+.sr .ic svg{width:26px;height:26px}
+.sr .ic.sm{width:36px;height:36px}
+.sr .ic.sm svg{width:19px;height:19px}
+.sr .ic.lg{width:64px;height:64px}
+.sr .ic.lg svg{width:32px;height:32px}
+.sr .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;width:min(100%,760px)}
+.sr .tiles.two{grid-template-columns:repeat(2,minmax(0,1fr));width:min(100%,400px)}
+.sr .tile{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:22px 10px;font-weight:600;font-size:18px}
+.sr .chipbox{display:flex;align-items:center;gap:12px;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:8px 18px 8px 8px;font-weight:600;font-size:17px;min-width:230px}
+.sr .res{background:var(--gold-bg);border:2px solid var(--gold);border-radius:14px;padding:14px 40px;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,2.8vw,30px);color:var(--gold)}
+.sr .res small{display:block;font-family:var(--f-body);font-weight:500;font-size:12.5px;color:var(--muted);margin-top:2px}
+.sr .res.sm{font-size:19px;padding:10px 24px}
+.sr .stack{display:flex;flex-direction:column;align-items:center;gap:8px}
+.sr .row{display:flex;gap:18px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.sr .arrows{display:flex;gap:70px;justify-content:center;align-items:center;color:var(--muted)}
+.sr .arrows svg{width:14px;height:34px}
+.sr .arrows i{font-family:var(--f-q);font-size:16px}
+.sr .side{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;width:100%}
+.sr .qhd{background:var(--chip);border-radius:10px;padding:10px 20px;font-weight:600;font-size:19px;max-width:560px}
+.sr .list{display:grid;gap:8px;width:min(100%,400px)}
+.sr .list div{background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:6px 14px;font-size:17.5px}
+.sr .pair{display:grid;justify-items:stretch;gap:8px;width:max-content;max-width:100%}
+.sr .pair .or{text-align:center}
+.sr .pair .box{flex-direction:row;justify-content:center;padding:12px 22px;gap:14px}
+.sr .or{font-family:var(--f-q);font-style:italic;font-weight:700;font-size:20px;color:var(--muted)}
+.sr .box{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:18px 26px;font-weight:600;font-size:17px;min-width:290px}
+.sr .cats{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;width:min(100%,780px);text-align:left}
+.sr .cat{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px}
+.sr .cat .res{display:block;text-align:center;font-size:18px;padding:8px 10px;margin-bottom:10px}
+.sr .cat .g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sr .cat .g span{border:1.5px solid var(--line);border-radius:8px;padding:7px 8px;text-align:center;font-size:15.5px;background:var(--panel)}
+.sr .fix{display:grid;gap:7px;width:min(100%,300px)}
+.sr .fix div{border-radius:10px;padding:5px 14px;font-size:17px;font-weight:500;border:1.5px solid}
+.sr .method{display:flex;align-items:center;gap:14px;border-radius:12px;padding:8px 22px 8px 8px;border:2px solid;font-family:var(--f-display);font-weight:800;font-size:20px;min-width:290px}
+.sr .how{max-width:480px;margin:0;color:var(--ink);font-size:18px}
+.sr .blue .fix div,.sr .blue .method{background:var(--blue-bg);border-color:var(--blue)}
+.sr .blue .method{color:var(--blue)}
+.sr .orange .fix div,.sr .orange .method{background:var(--orange-bg);border-color:var(--orange)}
+.sr .orange .method{color:var(--orange)}
+.sr .pink .fix div,.sr .pink .method{background:var(--pink-bg);border-color:var(--pink)}
+.sr .pink .method{color:var(--pink)}
+.sr .purple .fix div,.sr .purple .method{background:var(--purple-bg);border-color:var(--purple)}
+.sr .purple .method{color:var(--purple)}
+.sr .week{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;width:min(100%,820px)}
+.sr .day{display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid;border-radius:14px;padding:22px 16px 18px}
+.sr .day b{font-family:var(--f-display);font-size:22px;margin-top:6px;white-space:nowrap}
+.sr .day span{font-size:16px}
+.sr .day span{color:var(--ink);opacity:.85}
+.sr .day.blue{background:var(--blue-bg);border-color:var(--blue)}
+.sr .day.blue b{color:var(--blue)}
+.sr .day.pink{background:var(--pink-bg);border-color:var(--pink)}
+.sr .day.pink b{color:var(--pink)}
+.sr .day.purple{background:var(--purple-bg);border-color:var(--purple)}
+.sr .day.purple b{color:var(--purple)}
+.sr .day.green{background:var(--green-bg);border-color:var(--green)}
+.sr .day.green b{color:var(--green)}
+.sr .plan{display:grid;grid-template-columns:auto minmax(0,560px);justify-content:center;gap:36px;align-items:center;width:100%;text-align:left}
+.sr .plan .who{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.sr .plan .who b{font-family:var(--f-display);font-weight:800;font-size:30px;line-height:1.15}
+.sr .plan .limit{font-family:var(--f-q);font-style:italic;font-size:16.5px;color:var(--muted)}
+.sr .steps{list-style:none;margin:0;padding:16px 20px;border:2px solid;border-radius:14px;display:grid;gap:12px;counter-reset:s}
+.sr .steps li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start;font-size:17.5px;line-height:1.4;counter-increment:s}
+.sr .steps li::before{content:counter(s);width:30px;height:30px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:500}
+.sr .steps b{font-weight:600}
+.sr .plan.blue .steps{background:var(--blue-bg);border-color:var(--blue)}
+.sr .plan.blue .who b,.sr .plan.blue .steps li::before{color:var(--blue)}
+.sr .plan.pink .steps{background:var(--pink-bg);border-color:var(--pink)}
+.sr .plan.pink .who b,.sr .plan.pink .steps li::before{color:var(--pink)}
+.sr .plan.purple .steps{background:var(--purple-bg);border-color:var(--purple)}
+.sr .plan.purple .who b,.sr .plan.purple .steps li::before{color:var(--purple)}
+.sr .plan.green .steps{background:var(--green-bg);border-color:var(--green)}
+.sr .plan.green .who b,.sr .plan.green .steps li::before{color:var(--green)}
+.sr .plan .ic{width:64px;height:64px}
+.sr .plan .ic svg{width:32px;height:32px}
+.sr .sbar{height:4px;background:var(--line);border-radius:4px;margin-top:14px;overflow:hidden}
+.sr .sbar i{display:block;height:100%;width:0;background:var(--gold);transition:width .8s cubic-bezier(.22,.61,.36,1)}
+.sr .ctrl{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.sr .hint{font-size:13.5px;color:var(--muted)}
+@media (max-width:760px){.sr .deck{padding-top:18px}
+.sr .stage{aspect-ratio:auto;height:min(72vh,640px);min-height:440px}
+.sr .slide{padding:22px 18px}
+.sr .fit{gap:14px}
+.sr .tiles{grid-template-columns:repeat(2,minmax(0,1fr));width:min(100%,320px)}
+.sr .side,.sr .cats,.sr .plan{grid-template-columns:1fr;gap:10px}
+.sr .week{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sr .plan .who{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px 12px}
+.sr .plan .who b{font-size:22px}
+.sr .plan .who b br{display:none}
+.sr .plan .limit{flex-basis:100%}
+.sr .plan .ic{width:44px;height:44px}
+.sr .plan .ic svg{width:22px;height:22px}
+.sr .steps li{font-size:15px}
+.sr .tile{font-size:15.5px;padding:18px 10px}
+.sr .qhd{font-size:17px}
+.sr .list div,.sr .fix div{font-size:16px}
+.sr .how{font-size:16px}
+.sr .cat .g span{font-size:14px}
+.sr .day b{font-size:19px}
+.sr .arrows{gap:40px}
+.sr .chipbox,.sr .box,.sr .method{min-width:0}
+}
+.sr-sub{margin:0;color:rgba(255,255,255,.85);font-size:16px}
 </style>
 
 <header class="top pad"><div class="wrap">
   <a class="logo" href="#" aria-label="English Magic home"><img src="data:image/png;base64,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" alt="ESL Tour"></a>
   <button class="mbtn" id="mbtn" aria-label="Menu" aria-expanded="false"><svg class="bars" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="x" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-  <nav class="qlinks"><a href="#test-your-level">Test Your Level</a><a href="#" id="navTeacher">Need a Teacher?</a><a href="#" id="navRequest">Request a Presentation</a><a href="#streams">Streams</a><a href="#" id="navReport">Report a Problem</a></nav>
+  <nav class="qlinks"><a href="#test-your-level">Test Your Level</a><a href="#" id="navTeacher">Need a Teacher?</a><a href="#" id="navRequest">Request a Presentation</a><a href="#streams">Streams</a><a href="#study-routine">Study Routine</a><a href="#" id="navReport">Report a Problem</a></nav>
   <label class="tsearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="q" type="search" placeholder="Search topics…" autocomplete="off" aria-label="Search topics"></label>
 </div></header>
@@ -1420,6 +1546,351 @@ function ltResult() {
   window.scrollTo(0, 0);
 }
 
+// ---------- study routine (the ESL Learning Progression deck, shown as a presentation) ----------
+function viewRoutine() {
+  document.body.classList.remove('home');
+  const v = document.createElement('div');
+  v.className = 'sr';
+  v.innerHTML = `<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-grammar" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a2 2 0 0 1 2 2v1h4a1 1 0 0 1 1 1v4h1a2 2 0 1 1 0 4h-1v4a1 1 0 0 1-1 1h-4v-1.2a2 2 0 1 0-4 0V21H4a1 1 0 0 1-1-1v-4h1.2a2 2 0 1 0 0-4H3V7a1 1 0 0 1 1-1h4V5a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="i-vocab" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm3 4v2h7V6H9zm0 4v2h7v-2H9zM6 18v2h12v-2H6z"/></symbol>
+    <symbol id="i-phonics" viewBox="0 0 24 24"><path fill="currentColor" d="M10.2 3h3.6l6.2 18h-3.9l-1.4-4.2H9.3L7.9 21H4zM10.4 13.6h3.2L12 8.5z"/></symbol>
+    <symbol id="i-spell" viewBox="0 0 24 24"><text x="1" y="12" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="currentColor">AB</text><path d="M9 17l3.5 3.5L21 12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-listen" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="3" y="13" width="5" height="8" rx="2" fill="currentColor"/><rect x="16" y="13" width="5" height="8" rx="2" fill="currentColor"/></symbol>
+    <symbol id="i-write" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14.5 5.5l3 3" stroke="var(--chip)" stroke-width="1.6"/></symbol>
+    <symbol id="i-read" viewBox="0 0 24 24"><path fill="currentColor" d="M2 5c3-1.3 6-1.3 9 .8V20c-3-2-6-2-9-.8zm11 .8c3-2.1 6-2.1 9-.8v14.2c-3-1.2-6-1.2-9 .8z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M14.5 14.5L20 20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="i-teacher" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l9 4-9 4-9-4zM6 8.5V11c0 1.8 2.7 3 6 3s6-1.2 6-3V8.5L12 11zM4 20c0-3 3.6-5 8-5s8 2 8 5v1H4z"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path fill="currentColor" d="M20 3v6h-6z"/></symbol>
+    <symbol id="i-translate" viewBox="0 0 24 24"><rect x="2" y="5" width="9" height="12" rx="1.5" fill="currentColor"/><rect x="13" y="5" width="9" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><text x="3.6" y="14.5" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="var(--chip)">A</text><text x="14.6" y="14.5" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="currentColor">文</text></symbol>
+    <symbol id="i-down" viewBox="0 0 14 34"><path d="M7 0v30M2 25l5 7 5-7" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  </defs>
+</svg>
+<section class="band pad"><div class="wrap" style="max-width:980px">
+  <div class="sec-h"><h2>Study Routine</h2></div>
+  <p class="sr-sub">Fine-tune your routine to provide maximum value.</p>
+</div></section>
+<section class="pad"><div class="deck">
+  <div class="stage" id="srstage" aria-live="polite">
+
+    <!-- 1 -->
+    <div class="slide mid"><p class="say title">ESL Learning <em>Progression</em></p></div>
+
+    <!-- 2 -->
+    <div class="slide">
+      <p class="lead">English, beginner or intermediate, is made up of certain elements.</p>
+      <div class="tiles">
+        <div class="tile"><span class="ic"><svg><use href="#i-grammar"/></svg></span>Grammar</div>
+        <div class="tile"><span class="ic"><svg><use href="#i-vocab"/></svg></span>Vocabulary</div>
+        <div class="tile"><span class="ic"><svg><use href="#i-phonics"/></svg></span>Phonics</div>
+        <div class="tile"><span class="ic"><svg><use href="#i-spell"/></svg></span>Spelling</div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="slide mid"><p class="say">When learned, these elements provide <em class="hl">ability</em>.</p></div>
+    <!-- 4 -->
+    <div class="slide mid"><p class="say">For example...</p></div>
+
+    <!-- 5 -->
+    <div class="slide">
+      <div class="stack">
+        <div class="chipbox"><span class="ic sm"><svg><use href="#i-grammar"/></svg></span>Grammar</div>
+        <span class="plus">+</span>
+        <div class="chipbox"><span class="ic sm"><svg><use href="#i-vocab"/></svg></span>Vocabulary</div>
+      </div>
+      <p class="word">allow</p>
+      <div class="res">Understanding</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="slide mid"><p class="say">This understanding, when combined with phonics and spelling...</p></div>
+
+    <!-- 7 -->
+    <div class="slide">
+      <div class="stack">
+        <div class="res sm">Understanding</div>
+        <span class="plus">+</span>
+        <div class="chipbox"><span class="ic sm"><svg><use href="#i-phonics"/></svg></span>Phonics</div>
+        <span class="plus">+</span>
+        <div class="chipbox"><span class="ic sm"><svg><use href="#i-spell"/></svg></span>Spelling</div>
+      </div>
+      <p class="word">allow</p>
+      <div class="res">Literacy</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="slide mid"><p class="say">We can take this understanding, or literacy, and use them in the following ways:</p></div>
+
+    <!-- 9 -->
+    <div class="slide">
+      <div class="res sm">Understanding<small>(Grammar + Vocabulary)</small></div>
+      <div class="arrows"><svg><use href="#i-down"/></svg><i>allows</i><svg><use href="#i-down"/></svg></div>
+      <div class="tiles two">
+        <div class="tile"><span class="ic"><svg><use href="#i-mic"/></svg></span>Speaking</div>
+        <div class="tile"><span class="ic"><svg><use href="#i-listen"/></svg></span>Listening comprehension</div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="slide">
+      <div class="res sm">Understanding + Literacy<small>(Grammar + Vocabulary) + (Phonics + Spelling)</small></div>
+      <div class="arrows"><svg><use href="#i-down"/></svg><i>allow</i><svg><use href="#i-down"/></svg></div>
+      <div class="tiles two">
+        <div class="tile"><span class="ic"><svg><use href="#i-write"/></svg></span>Writing</div>
+        <div class="tile"><span class="ic"><svg><use href="#i-read"/></svg></span>Reading</div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="slide mid"><p class="say">While using English, we sometimes find that we don’t really have enough skill to say what we want, or in the way that we want to.</p></div>
+    <!-- 12 -->
+    <div class="slide mid"><p class="say">We discover our shortcomings as we go.</p></div>
+
+    <!-- 13 -->
+    <div class="slide">
+      <span class="ic lg"><svg><use href="#i-mic"/></svg></span>
+      <div class="qhd">When speaking, we can identify shortcomings in the following:</div>
+      <div class="list"><div>Grammar</div><div>Vocabulary</div><div>Pronunciation</div></div>
+    </div>
+    <!-- 14 -->
+    <div class="slide">
+      <span class="ic lg"><svg><use href="#i-listen"/></svg></span>
+      <div class="qhd">When listening, we can identify shortcomings in the following:</div>
+      <div class="list"><div>Grammar</div><div>Vocabulary</div><div>Sentence structure</div></div>
+    </div>
+    <!-- 15 -->
+    <div class="slide">
+      <span class="ic lg"><svg><use href="#i-write"/></svg></span>
+      <div class="qhd">When writing, we can identify shortcomings in the following:</div>
+      <div class="list"><div>Spelling</div><div>Grammar</div><div>Literacy</div><div>Sentence structure</div></div>
+    </div>
+    <!-- 16 -->
+    <div class="slide">
+      <span class="ic lg"><svg><use href="#i-read"/></svg></span>
+      <div class="qhd">When reading, we can identify shortcomings in the following:</div>
+      <div class="list"><div>Vocabulary</div><div>Grammar</div><div>Sentence structure</div><div>Literacy</div></div>
+    </div>
+
+    <!-- 17 -->
+    <div class="slide mid"><p class="say">How can we improve when there are so many things to work on?</p></div>
+
+    <!-- 18 -->
+    <div class="slide">
+      <div class="qhd">First, we need to identify where our shortcomings lie.</div>
+      <div class="pair">
+        <div class="box"><span class="ic"><svg><use href="#i-search"/></svg></span>Recognizing what we don’t understand</div>
+        <span class="or">or</span>
+        <div class="box"><span class="ic"><svg><use href="#i-teacher"/></svg></span>A teacher’s correction</div>
+      </div>
+    </div>
+
+    <!-- 19 -->
+    <div class="slide">
+      <div class="qhd">Luckily, they all fall under a small group of specific categories.</div>
+      <div class="cats">
+        <div class="cat">
+          <span class="res">Understanding<small>(Grammar + Vocabulary)</small></span>
+          <div class="g"><span>Pronunciation</span><span>Fluency</span><span>Muscle memory</span><span>Bad habits</span><span>Sentence structure</span><span>Grammar</span><span>Vocabulary</span></div>
+        </div>
+        <div class="cat">
+          <span class="res">Literacy<small>(Phonics + Spelling)</small></span>
+          <div class="g"><span>Reading</span><span>Spelling</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 20 -->
+    <div class="slide blue">
+      <p class="lead">To enhance and correct <em>these</em></p>
+      <div class="fix"><div>Pronunciation</div><div>Fluency</div><div>Muscle memory</div></div>
+      <p class="word">use this</p>
+      <div class="method"><span class="ic sm"><svg><use href="#i-listen"/></svg></span>Shadowing</div>
+      <p class="how">Play a TV show, podcast or audio book, and repeat what you hear as soon as you hear it.</p>
+    </div>
+    <!-- 21 -->
+    <div class="slide orange">
+      <p class="lead">To correct <em>these</em></p>
+      <div class="fix"><div>Bad habits</div></div>
+      <p class="word">use this</p>
+      <div class="method"><span class="ic sm"><svg><use href="#i-redo"/></svg></span>Corrective practice</div>
+      <p class="how">Repeat the correct form of your common speaking errors until it becomes automatic.</p>
+    </div>
+    <!-- 22 -->
+    <div class="slide pink">
+      <p class="lead">To enhance and correct <em>these</em></p>
+      <div class="fix"><div>Sentence structure</div><div>Grammar</div><div>Vocabulary</div></div>
+      <p class="word">use this</p>
+      <div class="method"><span class="ic sm"><svg><use href="#i-write"/></svg></span>Study and production</div>
+      <p class="how">Study the concepts you find difficult, then make your own sentences using them.</p>
+    </div>
+    <!-- 23 -->
+    <div class="slide purple">
+      <p class="lead">To enhance and correct <em>these</em></p>
+      <div class="fix"><div>Reading</div><div>Spelling</div></div>
+      <p class="word">use this</p>
+      <div class="method"><span class="ic sm"><svg><use href="#i-spell"/></svg></span>Study and production</div>
+      <p class="how">Write out the words you misspell, and practice the phonics rules you find difficult, again and again.</p>
+    </div>
+
+    <!-- 24–28 -->
+    <div class="slide mid"><p class="say">The <em class="hl">magnitude</em> of this can be discouraging.</p></div>
+    <div class="slide mid"><p class="say">But<br><span class="rest"><span class="nw">we can pre-emptively</span> <span class="nw">address these.</span></span></p></div>
+    <div class="slide mid"><p class="say">By doing so, it feels like progress, instead of correction, yet produces the same result.</p></div>
+    <div class="slide mid"><p class="say">But it requires <em class="hl">commitment</em>.</p></div>
+    <div class="slide mid"><p class="say">4 exercises, divided into a weekly routine, can be very useful.</p></div>
+
+    <!-- 29 -->
+    <div class="slide">
+      <div class="qhd">Weekly Study Schedule</div>
+      <div class="week">
+        <div class="day blue"><span class="ic"><svg><use href="#i-mic"/></svg></span><b>Blue Day</b><span>Speaking</span></div>
+        <div class="day pink"><span class="ic"><svg><use href="#i-grammar"/></svg></span><b>Pink Day</b><span>Grammar</span></div>
+        <div class="day purple"><span class="ic"><svg><use href="#i-read"/></svg></span><b>Purple Day</b><span>Reading</span></div>
+        <div class="day green"><span class="ic"><svg><use href="#i-translate"/></svg></span><b>Green Day</b><span>Writing</span></div>
+      </div>
+    </div>
+
+    <!-- 30 -->
+    <div class="slide">
+      <div class="plan blue">
+        <div class="who"><span class="ic"><svg><use href="#i-mic"/></svg></span><b>Blue Day:<br> Speaking</b><span class="limit">Limit yourself to 5 new words</span></div>
+        <ol class="steps">
+          <li><span><b>Shadowing (10 to 15 min):</b> Write down any words you don’t know as you go.</span></li>
+          <li><span><b>Choose</b> the words you want to remember.</span></li>
+          <li><span><b>Study (10 min):</b> Study those words.</span></li>
+          <li><span><b>Production (10 to 15 min):</b> Speak sentences with those words. This is muscle memory practice.</span></li>
+        </ol>
+      </div>
+    </div>
+    <!-- 31 -->
+    <div class="slide">
+      <div class="plan pink">
+        <div class="who"><span class="ic"><svg><use href="#i-grammar"/></svg></span><b>Pink Day:<br> Grammar</b><span class="limit">Limit yourself to 5 new words</span></div>
+        <ol class="steps">
+          <li><span><b>Grammar book (10 to 15 min)</b></span></li>
+          <li><span><b>Choose</b> the words you want to remember.</span></li>
+          <li><span><b>Study</b> those words.</span></li>
+          <li><span><b>Production (10 to 15 min):</b> Write sentences using the grammar point and those words.</span></li>
+          <li><span><b>Speak as you go.</b></span></li>
+        </ol>
+      </div>
+    </div>
+    <!-- 32 -->
+    <div class="slide">
+      <div class="plan purple">
+        <div class="who"><span class="ic"><svg><use href="#i-read"/></svg></span><b>Purple Day:<br> Reading</b><span class="limit">Limit yourself to 5 new words</span></div>
+        <ol class="steps">
+          <li><span><b>Reading (10 to 15 min):</b> Read a book, article or story. Write down any words or sentences you don’t understand.</span></li>
+          <li><span><b>Choose</b> the words you want to remember.</span></li>
+          <li><span><b>Study</b> those words.</span></li>
+          <li><span><b>Production (10 to 15 min):</b> Write sentences using those words.</span></li>
+          <li><span><b>Speak as you go.</b></span></li>
+        </ol>
+      </div>
+    </div>
+    <!-- 33 -->
+    <div class="slide">
+      <div class="plan green">
+        <div class="who"><span class="ic"><svg><use href="#i-translate"/></svg></span><b>Green Day:<br> Writing</b></div>
+        <ol class="steps">
+          <li><span><b>Translate (10 to 15 min):</b> Choose something written in your own language and translate it into English.</span></li>
+          <li><span><b>Make note of anything you don’t know how to say.</b></span></li>
+          <li><span><b>Study:</b> Study what you noted.</span></li>
+          <li><span><b>Speak as you go.</b></span></li>
+          <li><span><b>No production step on this day.</b></span></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- 34–36 -->
+    <div class="slide mid"><p class="say">These exercises can take anywhere between 30 minutes to an hour, depending on the level of effort put forth.</p></div>
+    <div class="slide mid"><p class="say">But through diligence, and a regular routine, they will work.</p></div>
+    <div class="slide mid"><p class="say end">Good Luck!</p></div>
+  </div>
+
+  <div class="sbar"><i id="srbar"></i></div>
+  <div class="ctrl">
+    <button class="btn" id="srprev">← Back</button>
+    <span class="hint" id="srhint">Click the slide to continue</span>
+  </div>
+</div></section>`;
+  main.replaceChildren(v);
+  window.scrollTo(0, 0);
+  // listeners for this page only; removed when the visitor goes to another page
+  var ac=new AbortController();
+  window.addEventListener('hashchange',function(){ac.abort();mo&&mo.disconnect();clearTimeout(pend);},{once:true});
+  var mo=null,pend=null;
+
+  var slides=[].slice.call(v.querySelectorAll('.sr .slide')), i=0, n=slides.length;
+  var prev=v.querySelector('#srprev');
+  function show(k){
+    i=Math.max(0,Math.min(n-1,k));
+    slides.forEach(function(s,j){s.classList.toggle('on',j===i); if(j===i) s.scrollTop=0;});
+    v.querySelector('#srbar').style.width=((i+1)/n*100)+'%';
+    prev.disabled=i===0;
+    v.querySelector('#srhint').style.visibility=i===n-1?'hidden':'visible';
+    v.querySelector('#srstage').style.cursor=i===n-1?'default':'pointer';
+  }
+  prev.onclick=function(){show(i-1)};
+  v.querySelector('#srstage').onclick=function(){show(i+1)};
+  document.addEventListener('keydown',function(e){
+    if(document.getElementById('exov'))return;
+    if(e.target.closest&&e.target.closest('input,textarea,select'))return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();show(i+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1)}
+  },{signal:ac.signal});
+  var x0=null;
+  var st=v.querySelector('#srstage');
+  st.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  st.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50){show(dx<0?i+1:i-1)}x0=null},{passive:true});
+  // enlarge each slide's content to fill the frame (most of its width or height, whichever runs out first)
+  function measure(f){
+    var fr=f.getBoundingClientRect(), L=1e9, R=-1e9, over=false;
+    [].forEach.call(f.children,function(c){
+      var b=c.getBoundingClientRect();
+      if(c.matches('.say,.lead,.word,.how')){var rg=document.createRange();rg.selectNodeContents(c);b=rg.getBoundingClientRect();}
+      if(c.classList.contains('plan')){var a=c.children[0].getBoundingClientRect(),z=c.children[1].getBoundingClientRect();b={left:Math.min(a.left,z.left),right:Math.max(a.right,z.right)};}
+      L=Math.min(L,b.left);R=Math.max(R,b.right);
+    });
+    // a word poking out of its box means this width is too narrow
+    [].forEach.call(f.querySelectorAll('.tile,.chipbox,.box,.day,.day b,.res small,.say .nw,.list div,.fix div,.method,.cat .g span,.res,.qhd,.steps li'),function(e){if(e.scrollWidth>e.clientWidth+1)over=true;});
+    [].forEach.call(f.querySelectorAll('.day'),function(d){var b=d.querySelector('b');if(b.getBoundingClientRect().width>d.clientWidth-32)over=true;});
+    return {w:Math.max(1,R-L),h:Math.max(1,fr.height),over:over};
+  }
+  // enlarge each slide's content to fill the frame (most of its width or height, whichever runs out first)
+  function fit(){
+    slides.forEach(function(sl){
+      var f=sl.firstElementChild; f.style.transform='none'; f.style.width='';
+      var cs=getComputedStyle(sl);
+      var aw=sl.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+      var ah=sl.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+      var best=null;
+      // text-only slides: keep lines from getting too short (no one-word lines on phones)
+      var textOnly=f.children.length===1&&f.firstElementChild.classList.contains('say');
+      for(var s=1.9;s>=1;s-=0.05){
+        if(textOnly&&aw/s<220)continue;
+        f.style.width=(aw/s)+'px';
+        var m=measure(f);
+        if(!m.over&&m.h*s<=ah*0.9&&m.w*s<=aw+1){best=s;break;}
+      }
+      if(best){f.style.transform='scale('+best.toFixed(3)+')';return;}
+      f.style.width='';
+      m=measure(f); var k=Math.min(1,aw/m.w,ah/m.h);
+      f.style.transform='scale('+k.toFixed(3)+')';
+    });
+  }
+  slides.forEach(function(sl){var f=document.createElement('div');f.className='fit';while(sl.firstChild)f.appendChild(sl.firstChild);sl.appendChild(f);});
+  fit(); window.addEventListener('resize',fit,{signal:ac.signal});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+  // if the visitor's browser translates the page, re-fit the slides to the new words
+  var mo=new MutationObserver(function(){clearTimeout(pend);pend=setTimeout(fit,150);});
+  mo.observe(v.querySelector('#srstage'),{subtree:true,childList:true,characterData:true});
+  show(0);
+}
+
 // ---------- routing ----------
 function go(h) { if (location.hash.slice(1) === h) route(); else location.hash = h; }
 function route() {
@@ -1430,6 +1901,7 @@ function route() {
   if (h === 'availability') return viewAvail();
   if (h === 'test-your-level') return viewLevelTest();
   if (h === 'streams' || h.startsWith('streams/')) return viewStreams();
+  if (h === 'study-routine') return viewRoutine();
   if (h === 'contact' || h.startsWith('contact/')) return viewContact(h.slice(8));
   if (h.startsWith('topic-')) { const [c, x] = h.slice(6).split('/'); return viewBrowse(null, c, x); }
   if (h.startsWith('level-')) { const [b, c, x] = h.slice(6).split('/'); if (BANDS.includes(b.toUpperCase())) return viewBrowse(b.toUpperCase(), c, x); }
