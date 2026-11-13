@@ -208,6 +208,20 @@ h2{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.
 .lslide table{width:100%;height:100%;border-collapse:collapse}
 .lhint{font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.lslide .shp{transition:none}}
+.presov{position:fixed;inset:0;z-index:200;background:#000;display:flex;flex-direction:column}
+body.presenting{overflow:hidden}
+.pres-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px}
+.pres-stage .lslide{border-radius:0;box-shadow:none;height:100%;width:auto}
+.lslide.pres .shp{transition:none}
+.pres-msg{color:#ccc;font:16px var(--f-body,sans-serif)}
+.pres-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;color:#bbb;font:14px var(--f-body,sans-serif);opacity:.35;transition:opacity .2s}
+.pres-bar:hover,.pres-bar:focus-within{opacity:1}
+.pres-bar button{background:#222;color:#eee;border:1px solid #444;border-radius:6px;padding:5px 12px;font:inherit;cursor:pointer}
+.pres-bar button:disabled{opacity:.35;cursor:default}
+.pres-gap{flex:1}
+.presov:fullscreen .pres-bar{position:absolute;bottom:0;left:0;right:0;opacity:0}
+.presov:fullscreen .pres-bar:hover{opacity:1}
+.presov:fullscreen .pres-stage{padding:0}
 .lvbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 14px}
 .lvbar .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:6px}
 .lv{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 13px;cursor:pointer;font-size:13.5px;font-weight:500}
@@ -1068,6 +1082,7 @@ function renderLessonSlide(d, sl) {
     b.dataset.rot = sh.rot || 0;
     if (sh.ins) { const W = d.w, [l, t, r, bt] = sh.ins; b.style.padding = `${t / W * 100}cqw ${r / W * 100}cqw ${bt / W * 100}cqw ${l / W * 100}cqw`; }
     b.style.justifyContent = { t: 'flex-start', ctr: 'center', b: 'flex-end' }[sh.an || 't'] || 'flex-start';
+    if (sh.img) { const im = document.createElement('img'); im.src = sh.img; im.alt = ''; im.style.cssText = 'width:100%;height:100%;object-fit:fill;display:block'; b.appendChild(im); }
     for (const p of (sh.p || [])) b.appendChild(lessonPara(p, wpt, sh.nw));
     if (sh.tbl) { const t = document.createElement('table'); for (const row of sh.tbl) { const tr = t.insertRow(); for (const c of row) { const td = tr.insertCell(); if (c.fill) td.style.background = c.fill; c.p.forEach(p => td.appendChild(lessonPara(p, wpt))); } } b.appendChild(t); }
     el.appendChild(b);
@@ -1107,6 +1122,73 @@ function applyLesson(el, d, sl, step) {
   });
 }
 
+// ---------- presentation (plays the PowerPoint slides, click by click) ----------
+async function openPresent(d) {
+  document.getElementById('presov')?.remove();
+  setFooter(d);
+  const ov = document.createElement('div'); ov.className = 'presov'; ov.id = 'presov';
+  ov.innerHTML = `<div class="pres-stage" id="pStage"><p class="pres-msg">Loading…</p></div>
+    <div class="pres-bar"><button id="pBack" aria-label="Back">←</button><span id="pPos"></span><button id="pNext" aria-label="Next">→</button>
+    <span class="pres-gap"></span><button id="pFull">Full screen</button><button id="pExit">✕ Exit</button></div>`;
+  document.body.appendChild(ov); document.body.classList.add('presenting');
+  const exit = () => { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); if (movedInSite) history.back(); else go(d.slug); };
+  ov.exit = exit;
+  $('#pExit').onclick = exit;
+  $('#pFull').onclick = () => document.fullscreenElement ? document.exitFullscreen() : ov.requestFullscreen().catch(() => {});
+  let P;
+  try { P = await fetch('slides/' + d.slug + '.json').then(r => { if (!r.ok) throw 0; return r.json(); }); }
+  catch (e) { $('#pStage').innerHTML = '<p class="pres-msg">The slides for this set could not be loaded.</p>'; return; }
+  if (!document.body.contains(ov)) return;
+  let n = 0, step = 0, el = null;
+  const fly = {}; // shapes that fly in: how far below their place they start (cqw)
+  const place = animate => {
+    const sl = P.sl[n], { vis, mv } = lessonState(sl, step);
+    const acts = {}; if (animate && step > 0) for (const a of sl.k[step - 1]) acts[a[0]] = a;
+    el.querySelectorAll('.shp').forEach(b => {
+      const id = b.dataset.id, a = acts[id], o = (a && a[4]) || {}, dl = (o.d || 0) + 'ms';
+      const hidden = vis[id] === false, m = mv[id] || [0, 0], f = hidden && fly[id] ? fly[id] : 0;
+      b.style.transition = !a ? 'none' : a[1] === 'mv' ? `transform 450ms ease ${dl}` : o.f ? `transform 500ms ease-out ${dl}, opacity 0s linear ${dl}` : `opacity 0s linear ${dl}`;
+      b.classList.toggle('hide', hidden);
+      b.style.transform = `translate(${(m[0] * 100).toFixed(3)}cqw, ${(m[1] * 100 / P.ar + f).toFixed(3)}cqw)`;
+    });
+  };
+  const draw = () => {
+    const sl = P.sl[n]; el = renderLessonSlide(P, sl); el.classList.add('pres');
+    for (const k in fly) delete fly[k];
+    sl.k.forEach(c => c.forEach(a => { if (a[1] === 'in' && a[4] && a[4].f) { const sh = sl.s.find(x => x.id === a[0]); if (sh) fly[a[0]] = (100 - sh.y) / P.ar; } }));
+    $('#pStage').replaceChildren(el); place(false);
+    el.onclick = () => ov.move(1);
+    $('#pPos').textContent = `${n + 1} / ${P.sl.length}`;
+    $('#pBack').disabled = n === 0 && step === 0;
+  };
+  ov.move = dir => {
+    const steps = P.sl[n].k.length;
+    if (dir > 0) {
+      if (step < steps) { step++; place(true); }
+      else if (n < P.sl.length - 1) { n++; step = 0; draw(); }
+    } else {
+      if (step > 0) { step--; place(false); }
+      else if (n > 0) { n--; step = P.sl[n].k.length; draw(); }
+    }
+    $('#pBack').disabled = n === 0 && step === 0;
+  };
+  ov.jump = end => { n = end ? P.sl.length - 1 : 0; step = end ? P.sl[n].k.length : 0; draw(); };
+  $('#pBack').onclick = () => ov.move(-1);
+  $('#pNext').onclick = () => ov.move(1);
+  draw();
+}
+window.addEventListener('hashchange', () => { if (!/-present$/.test(location.hash)) { document.getElementById('presov')?.remove(); document.body.classList.remove('presenting'); } });
+document.addEventListener('keydown', e => {
+  const ov = document.getElementById('presov'); if (!ov) return;
+  e.stopImmediatePropagation();
+  if (e.key === 'Escape') { if (!document.fullscreenElement) ov.exit(); return; }
+  if (!ov.move) return;
+  if (['ArrowRight', 'ArrowDown', ' ', 'Enter', 'PageDown', 'n'].includes(e.key)) { e.preventDefault(); ov.move(1); }
+  else if (['ArrowLeft', 'ArrowUp', 'Backspace', 'PageUp', 'p'].includes(e.key)) { e.preventDefault(); ov.move(-1); }
+  else if (e.key === 'Home') ov.jump(false);
+  else if (e.key === 'End') ov.jump(true);
+}, true);
+
 // ---------- quiz ----------
 let S = null; // { d, idx, answers: {j: {pick, ok, shown}} }
 // footer: sets taken from Eiken practice books (marked ek) credit their source instead of the © line
@@ -1130,13 +1212,15 @@ function askMode(d) {
   const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
   ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true"><h3>How do you want to take this set?</h3>
     <div class="modes"><button id="mTest"><b>Test</b><span>Answer every question first, then see your score and the answers at the end.</span></button>
-    <button id="mPrac"><b>Practice</b><span>See the answer after each question.</span></button></div></div>`;
+    <button id="mPrac"><b>Practice</b><span>See the answer after each question.</span></button>
+    <button id="mPres"><b>Presentation</b><span>Watch the slides, the same as on the live stream.</span></button></div></div>`;
   document.body.appendChild(ov);
   const set = m => { ov.remove(); S.mode = m; renderQuiz(); };
   // Escape backs out to the page they came from (home if they arrived straight on this set)
   ov.close = () => { ov.remove(); if (movedInSite) history.back(); else go(''); };
   $('#mTest').onclick = () => set('test');
   $('#mPrac').onclick = () => set('practice');
+  $('#mPres').onclick = () => { ov.remove(); location.replace('#' + d.slug + '-present'); };
   $('#mTest').focus();
 }
 function confirmFinish(left) {
@@ -1907,6 +1991,8 @@ function route() {
   if (h.startsWith('search-')) { viewHome(); const t = h.slice(7); $('#bigQ').value = t; showResults(t); return; }
   let m = h.match(/^(.*)-q(\d+)$/);
   if (m && bySlug[m[1]]) return startDeck(bySlug[m[1]], +m[2] - 1);
+  m = h.match(/^(.*)-present$/);
+  if (m && bySlug[m[1]]) return openPresent(bySlug[m[1]]);
   m = h.match(/^(.*)-done$/);
   if (m && bySlug[m[1]]) return startDeck(bySlug[m[1]], 0);
   if (bySlug[h]) return startDeck(bySlug[h]);
