@@ -792,13 +792,14 @@ function viewStreams() {
     const dt = a.dataset.date;
     const ov = document.createElement('div'); ov.className = 'exov'; ov.id = 'exov';
     ov.innerHTML = `<div class="expanel ask" role="dialog" aria-modal="true">${dt ? `<p class="ps-pop-k">Streamed ${MONTHS[+dt.slice(5, 7) - 1]} ${+dt.slice(8)}, ${dt.slice(0, 4)}</p>` : ''}<h3>${esc(d.title)}</h3><p class="ps-pop-n">${d.nQ} questions</p>
-      <p class="ps-pop-q">Would you like to take this test?</p>
-      <div class="exbtns"><button class="btn primary" id="psYes">Yes</button><button class="btn" id="psNo">Not now</button></div></div>`;
+      <p class="ps-pop-q">What would you like to do?</p>
+      <div class="exbtns"><button class="btn primary" id="psYes" style="white-space:nowrap">Test</button><button class="btn primary" id="psPres" style="white-space:nowrap">Presentation</button><button class="btn" id="psNo" style="white-space:nowrap">Not now</button></div></div>`;
     document.body.appendChild(ov);
     ov.close = () => ov.remove();
     ov.onclick = ev => { if (ev.target === ov) ov.remove(); };
     $('#psYes').onclick = () => { ov.remove(); go(d.slug); };
     $('#psNo').onclick = () => ov.remove();
+    $('#psPres').onclick = () => { ov.remove(); go(d.slug + '-present'); };
     $('#psYes').focus();
   });
   window.scrollTo(0, 0);
